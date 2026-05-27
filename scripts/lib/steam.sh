@@ -15,9 +15,14 @@ lo::steam::cmd() {
   "$bin" "$@"
 }
 
-# Internal: app_update with optional `validate` argument.
+# Internal: app_update, optionally appending the `validate` token.
 lo::steam::_app_update() {
-  local validate=$1
+  local mode=${1:-}
+  local -a extra=()
+  if [[ "$mode" == "validate" ]]; then
+    extra+=(validate)
+  fi
+
   lo::config::require INSTALL_DIR STEAM_LINUX_APP_ID STEAM_USER
   install -d -m 0755 "$INSTALL_DIR"
 
@@ -27,13 +32,13 @@ lo::steam::_app_update() {
     +@sSteamCmdForcePlatformType linux \
     +force_install_dir "$INSTALL_DIR" \
     +login "$STEAM_USER" \
-    +app_update "$STEAM_LINUX_APP_ID" $validate \
+    +app_update "$STEAM_LINUX_APP_ID" "${extra[@]}" \
     +quit
   lo::log::ok "steamcmd app_update finished"
 }
 
 lo::steam::install()  { lo::steam::_app_update validate; }
-lo::steam::update()   { lo::steam::_app_update ""; }
+lo::steam::update()   { lo::steam::_app_update; }
 lo::steam::validate() { lo::steam::_app_update validate; }
 
 lo::steam::login() {
