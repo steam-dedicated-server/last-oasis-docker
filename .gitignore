@@ -17,6 +17,10 @@ k8s/secret.yaml
 *.swp
 *~
 
+# Claude Code local config (per-user). Blueprint docs under
+# .claude/blueprint/ are intentionally tracked.
+.claude/settings.local.json
+
 # os
 .DS_Store
 Thumbs.db
