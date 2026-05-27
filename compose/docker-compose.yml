@@ -37,7 +37,7 @@ x-common: &common
       hard: 1048576
     nproc: 65535
   volumes:
-    - lastoasis-data:/data
+    - lastoasis-data:/mnt/steam
   tmpfs:
     - /tmp:size=256m
   logging:

@@ -79,6 +79,12 @@ lo::server::run() {
   # Headroom for FDs (Steam SDK + many concurrent player connections).
   ulimit -n 65536 2>/dev/null || true
 
+  # Bias the scheduler toward the game thread. Soft-fail: a negative
+  # nice value needs CAP_SYS_NICE — without it renice is a no-op and
+  # MistServer runs at default priority. In k8s, grant via:
+  #   capabilities: { add: ["SYS_NICE"] }
+  renice -n -5 $$ >/dev/null 2>&1 || true
+
   local bin
   bin=$(lo::server::_binary)
 

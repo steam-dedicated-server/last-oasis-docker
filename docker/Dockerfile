@@ -29,13 +29,13 @@ RUN curl -fsSL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.
 FROM ubuntu:24.04 AS runtime
 
 ARG STEAM_UID=1000
-ARG STEAM_GID=1000
+ARG STEAM_GID=1001
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     IN_DOCKER=1 \
-    HOME=/data \
+    HOME=/mnt/steam \
     PATH=/opt/lastoasis/scripts:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -60,9 +60,11 @@ RUN if id ubuntu >/dev/null 2>&1; then userdel --remove ubuntu; fi && \
              --create-home steam
 
 # Persistent data volume (game files, saves, steamcmd state).
-# HOME is set to /data so steamcmd's ~/.steam lands inside the volume.
-RUN install -d -o steam -g steam -m 0755 /data
-VOLUME ["/data"]
+# HOME is set to /mnt/steam so steamcmd's ~/.steam lands inside the
+# volume. /mnt/steam matches the upstream convention so existing
+# K8s manifests and PVCs migrate cleanly.
+RUN install -d -o steam -g steam -m 0755 /mnt/steam
+VOLUME ["/mnt/steam"]
 
 # steamcmd binary lives in the image (NOT in /data) so volume mounts
 # don't shadow it.

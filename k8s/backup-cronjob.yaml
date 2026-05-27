@@ -15,18 +15,19 @@ spec:
           restartPolicy: OnFailure
           securityContext:
             runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
+            runAsGroup: 1001
+            fsGroup: 1001
           containers:
             - name: backup
               image: ghcr.io/steam-dedicated-server/last-oasis-docker:latest
+              imagePullPolicy: Always
               args: ["backup"]
               envFrom:
                 - secretRef:
                     name: lastoasis-config
               volumeMounts:
                 - name: data
-                  mountPath: /data
+                  mountPath: /mnt/steam
               resources:
                 requests: { cpu: "200m", memory: "128Mi" }
                 limits:   { cpu: "1",    memory: "512Mi" }
