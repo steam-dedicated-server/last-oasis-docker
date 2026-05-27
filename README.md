@@ -10,6 +10,11 @@ High-performance, container-first dedicated server for [Last Oasis](https://last
 - Production-tuned Docker Compose for a single VPS (4 vCPU / 6 GB RAM)
 - Kustomize-based Kubernetes bundle (single-node k3s tested)
 
+> Inspired by and derived from the original
+> [Deradon/last-oasis-docker-dedicated-server](https://github.com/Deradon/last-oasis-docker-dedicated-server)
+> — full credit for the original approach belongs there. This is a clean-slate
+> rewrite focused on performance, layout, and a single-server VPS workflow.
+>
 > Not affiliated with Donkey Crew. Use at your own risk.
 
 ---
@@ -189,6 +194,17 @@ SLSA provenance attestation.
 
 ---
 
+## Credits
+
+Built on the shoulders of
+[Deradon/last-oasis-docker-dedicated-server](https://github.com/Deradon/last-oasis-docker-dedicated-server)
+— the upstream project that figured out the original steamcmd + Docker
+recipe, the multi-server compose pattern, and the realm-key workflow.
+
+This repo is a structural rewrite; the underlying ideas, env-var
+conventions, and operational lessons are theirs.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
+Original work © Deradon and contributors, also under MIT.
