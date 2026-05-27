@@ -64,6 +64,12 @@ lo::server::run() {
 
   lo::server::_assert_installed
   lo::config::print
+
+  # Donkey Crew recommends keeping slots <= 100 per server.
+  if [[ "${SERVER_SLOTS}" =~ ^[0-9]+$ ]] && (( SERVER_SLOTS > 100 )); then
+    lo::log::warn "SERVER_SLOTS=${SERVER_SLOTS} exceeds the recommended max of 100"
+  fi
+
   lo::server::_link_steamclient
 
   # Help libraries that dlopen by name (not absolute path) find
@@ -76,22 +82,26 @@ lo::server::run() {
   local bin
   bin=$(lo::server::_binary)
 
-  # Built-in flags:
+  # Built-in flags (matches Donkey Crew's official example):
   #   -log                              — write Mist.log
   #   -force_steamclient_link           — UE4 uses Steam SDK linkage
   #   -messaging                        — engine messaging subsystem
   #   -NoLiveServer                     — disable live-server gating
+  #   -EnableCheats                     — admin / cheat commands
   #   -USEALLAVAILABLECORES             — UE4 task graph across cores
   #   -EnableParallelCharacterMovement  — parallel character movement
   #   -backendapiurloverride=…          — production matchmaking backend
+  #     (must be backend-PRODUCTION.last-oasis.com — the unsuffixed
+  #     `backend.last-oasis.com` resolves but won't register the realm)
   local -a args=(
     -log
     -force_steamclient_link
     -messaging
     -NoLiveServer
+    -EnableCheats
     -EnableParallelCharacterMovement
     -USEALLAVAILABLECORES
-    -backendapiurloverride=backend.last-oasis.com
+    -backendapiurloverride=backend-production.last-oasis.com
     "-identifier=${SERVER_IDENTIFIER}"
     "-port=${SERVER_PORT}"
     "-QueryPort=${SERVER_QUERY_PORT}"
