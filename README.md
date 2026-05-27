@@ -101,17 +101,17 @@ make down      # stop
 
 | Variable               | Required | Default            | Source                                            |
 |------------------------|:--------:|--------------------|---------------------------------------------------|
-| `SERVER_CUSTOMER_KEY`  |    ✅    | —                  | myrealm.lastoasis.gg → Settings                    |
-| `SERVER_PROVIDER_KEY`  |    ✅    | —                  | myrealm.lastoasis.gg → Settings                    |
-| `SERVER_IDENTIFIER`    |    ✅    | —                  | unique within realm                                |
-| `SERVER_IP_ADDRESS`    |    ✅    | —                  | host public IPv4                                   |
-| `SERVER_PORT`          |    ✅    | `62001`            | unique per IP/realm                                |
-| `SERVER_QUERY_PORT`    |    ✅    | `27015`            | unique per IP/realm                                |
-| `SERVER_SLOTS`         |          | `10`               | player capacity                                    |
-| `STEAM_USER`           |          | `anonymous`        | non-anonymous needs `lo login` once                |
-| `SERVER_OPTIONS`       |          | —                  | extra UE CLI flags, appended verbatim              |
-| `INSTALL_DIR`          |          | `/data/last-oasis` | install path inside the volume                     |
-| `BACKUP_DIR`           |          | `/data/backups`    | tarball destination                                |
+| `SERVER_CUSTOMER_KEY`  |    ✅    | —                       | [MyRealm → Settings](https://myrealm.lastoasis.gg/Settings) ("Game server registration key") |
+| `SERVER_PROVIDER_KEY`  |    ✅    | —                       | [MyRealm → Settings](https://myrealm.lastoasis.gg/Settings) ("Self hosted game servers registration keys") |
+| `SERVER_IDENTIFIER`    |    ✅    | —                       | unique within realm                          |
+| `SERVER_IP_ADDRESS`    |    ✅    | —                       | host public IPv4                             |
+| `SERVER_PORT`          |    ✅    | `62001`                 | unique per IP/realm                          |
+| `SERVER_QUERY_PORT`    |    ✅    | `27015`                 | unique per IP/realm                          |
+| `SERVER_SLOTS`         |          | `10`                    | player capacity (max 100)                    |
+| `STEAM_USER`           |          | `anonymous`             | non-anonymous needs `lo login` once          |
+| `SERVER_OPTIONS`       |          | —                       | extra UE CLI flags, appended verbatim        |
+| `INSTALL_DIR`          |          | `/mnt/steam/last-oasis` | install path inside the volume               |
+| `BACKUP_DIR`           |          | `/mnt/steam/backups`    | tarball destination                          |
 | `HEALTHCHECK_TIMEOUT`  |          | `3`                | seconds for A2S probe                              |
 | `LO_LOG_LEVEL`         |          | `info`             | `debug` for verbose                                |
 
