@@ -5,6 +5,12 @@ on:
   push:
     branches: [main]
 
+env:
+  # Opt JS actions into Node.js 24 ahead of the June 2026 cutover so
+  # we don't hit a forced-upgrade surprise. Safe to remove once all
+  # referenced actions ship Node 24-native releases.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
