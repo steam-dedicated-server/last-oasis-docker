@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lastoasis-server
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate                       # PVC is RWO; never run two pods
+  selector:
+    matchLabels:
+      app: lastoasis-server
+  template:
+    metadata:
+      labels:
+        app: lastoasis-server
+    spec:
+      hostNetwork: true                  # game ports come straight off the node IP
+      dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: server
+          image: ghcr.io/drsaluml/last-oasis-docker-dedicated-server:latest
+          args: ["run"]
+          envFrom:
+            - secretRef:
+                name: lastoasis-config
+          ports:
+            - { name: game,     containerPort: 62001, protocol: UDP, hostPort: 62001 }
+            - { name: game-tcp, containerPort: 62001, protocol: TCP, hostPort: 62001 }
+            - { name: query,    containerPort: 27015, protocol: UDP, hostPort: 27015 }
+          resources:
+            requests: { cpu: "2",   memory: "3Gi" }
+            limits:   { cpu: "3.5", memory: "5Gi" }
+          securityContext:
+            seccompProfile: { type: Unconfined }
+            capabilities:
+              drop: ["ALL"]
+          startupProbe:
+            exec: { command: ["python3", "/opt/lastoasis/healthcheck.py"] }
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            exec: { command: ["python3", "/opt/lastoasis/healthcheck.py"] }
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec: { command: ["python3", "/opt/lastoasis/healthcheck.py"] }
+            periodSeconds: 15
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: lastoasis-data

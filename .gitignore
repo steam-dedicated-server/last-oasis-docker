@@ -1,0 +1,22 @@
+# user config
+config/server.env
+.env
+.env.local
+
+# data
+data/
+backups/
+*.tar.gz
+
+# kubernetes secrets (rendered from secret.example.yaml)
+k8s/secret.yaml
+
+# editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# os
+.DS_Store
+Thumbs.db

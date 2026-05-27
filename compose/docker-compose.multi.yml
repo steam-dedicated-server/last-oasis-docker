@@ -1,0 +1,100 @@
+# ============================================================
+# Last Oasis — multi-server compose (multiple maps on one host)
+# ------------------------------------------------------------
+# Each `server-NN` service runs on a distinct game + query port
+# pair. All share the same persistent volume — the install/update
+# happens once via the `maintenance` services.
+# ============================================================
+
+x-image: &image
+  image: ghcr.io/drsaluml/last-oasis-docker-dedicated-server:latest
+
+x-common: &common
+  <<: *image
+  restart: unless-stopped
+  stop_grace_period: 60s
+  init: false
+  security_opt:
+    - seccomp:unconfined
+  ulimits:
+    nofile: { soft: 1048576, hard: 1048576 }
+    nproc: 65535
+  volumes:
+    - lastoasis-data:/data
+  tmpfs:
+    - /tmp:size=256m
+  logging:
+    driver: json-file
+    options: { max-size: "20m", max-file: "5" }
+
+x-base-env: &base-env
+  SERVER_CUSTOMER_KEY: "<REPLACE_CUSTOMER_KEY>"
+  SERVER_PROVIDER_KEY: "<REPLACE_PROVIDER_KEY>"
+  SERVER_IP_ADDRESS:   "<REPLACE_EXTERNAL_IP>"
+  STEAM_USER:          "anonymous"
+  SERVER_SLOTS:        "25"
+
+services:
+  install:
+    <<: *common
+    profiles: ["maintenance"]
+    restart: "no"
+    command: ["install"]
+    environment: *base-env
+
+  update:
+    <<: *common
+    profiles: ["maintenance"]
+    restart: "no"
+    command: ["update"]
+    environment: *base-env
+
+  server-01:
+    <<: *common
+    command: ["run"]
+    environment:
+      <<: *base-env
+      SERVER_IDENTIFIER: "oasis-01"
+      SERVER_PORT:       "62001"
+      SERVER_QUERY_PORT: "27015"
+    ports:
+      - "62001:62001/udp"
+      - "62001:62001/tcp"
+      - "27015:27015/udp"
+      - "27015:27015/tcp"
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+    healthcheck:
+      test: ["CMD", "python3", "/opt/lastoasis/healthcheck.py"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 180s
+
+  server-02:
+    <<: *common
+    command: ["run"]
+    environment:
+      <<: *base-env
+      SERVER_IDENTIFIER: "oasis-02"
+      SERVER_PORT:       "62002"
+      SERVER_QUERY_PORT: "27016"
+    ports:
+      - "62002:62002/udp"
+      - "62002:62002/tcp"
+      - "27016:27016/udp"
+      - "27016:27016/tcp"
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 4G }
+    healthcheck:
+      test: ["CMD", "python3", "/opt/lastoasis/healthcheck.py"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 180s
+
+volumes:
+  lastoasis-data:
+    driver: local

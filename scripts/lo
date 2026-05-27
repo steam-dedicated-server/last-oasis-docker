@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# lo — Last Oasis dedicated server CLI
+#
+# Single dispatcher used both in-container and on bare metal.
+# Sources libraries from ./lib and config from ../config.
+
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly LO_VERSION="1.0.0"
+
+LO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly LO_ROOT
+readonly LO_LIB="$LO_ROOT/scripts/lib"
+readonly LO_CONFIG_DIR="$LO_ROOT/config"
+readonly LO_HEALTHCHECK="$LO_ROOT/healthcheck.py"
+
+# shellcheck source=lib/common.sh
+. "$LO_LIB/common.sh"
+# shellcheck source=lib/config.sh
+. "$LO_LIB/config.sh"
+# shellcheck source=lib/steam.sh
+. "$LO_LIB/steam.sh"
+# shellcheck source=lib/server.sh
+. "$LO_LIB/server.sh"
+# shellcheck source=lib/backup.sh
+. "$LO_LIB/backup.sh"
+
+lo::config::load
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  install)         lo::steam::install   "$@" ;;
+  update)          lo::steam::update    "$@" ;;
+  validate)        lo::steam::validate  "$@" ;;
+  login)           lo::steam::login     "$@" ;;
+  run|start)       lo::server::run      "$@" ;;
+  backup)          lo::backup::create   "$@" ;;
+  health)          exec python3 "$LO_HEALTHCHECK" "$@" ;;
+  config)          lo::config::print ;;
+  shell)           exec bash -i ;;
+  version|-v)      echo "lo ${LO_VERSION}" ;;
+  help|-h|--help)  lo::help ;;
+  *)
+    lo::log::error "Unknown command: $cmd"
+    lo::help >&2
+    exit 64
+    ;;
+esac

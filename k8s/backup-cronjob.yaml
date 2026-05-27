@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lastoasis-backup
+spec:
+  schedule: "0 4 * * *"                  # 04:00 UTC daily
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: backup
+              image: ghcr.io/drsaluml/last-oasis-docker-dedicated-server:latest
+              args: ["backup"]
+              envFrom:
+                - secretRef:
+                    name: lastoasis-config
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+              resources:
+                requests: { cpu: "200m", memory: "128Mi" }
+                limits:   { cpu: "1",    memory: "512Mi" }
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: lastoasis-data

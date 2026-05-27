@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lastoasis-install
+spec:
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: install
+          image: ghcr.io/drsaluml/last-oasis-docker-dedicated-server:latest
+          args: ["install"]
+          envFrom:
+            - secretRef:
+                name: lastoasis-config
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          securityContext:
+            seccompProfile: { type: Unconfined }
+          resources:
+            requests: { cpu: "500m", memory: "512Mi" }
+            limits:   { cpu: "2",    memory: "2Gi" }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: lastoasis-data

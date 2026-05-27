@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: last-oasis
+
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - install-job.yaml
+  - deployment.yaml
+  - backup-cronjob.yaml
+  # secret.yaml is git-ignored — `kubectl apply -f secret.yaml` manually
+  # after copying secret.example.yaml.
+
+images:
+  - name: ghcr.io/drsaluml/last-oasis-docker-dedicated-server
+    newTag: latest
+
+commonLabels:
+  app.kubernetes.io/name: last-oasis
+  app.kubernetes.io/managed-by: kustomize
