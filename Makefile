@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-IMAGE     ?= ghcr.io/drsaluml/last-oasis-docker-dedicated-server
+IMAGE     ?= ghcr.io/steam-dedicated-server/last-oasis-docker
 VERSION   ?= dev
 PLATFORMS ?= linux/amd64
 COMPOSE   ?= docker compose

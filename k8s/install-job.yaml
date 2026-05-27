@@ -14,7 +14,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: install
-          image: ghcr.io/drsaluml/last-oasis-docker-dedicated-server:latest
+          image: ghcr.io/steam-dedicated-server/last-oasis-docker:latest
           args: ["install"]
           envFrom:
             - secretRef:

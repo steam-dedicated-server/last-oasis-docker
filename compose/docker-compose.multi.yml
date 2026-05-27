@@ -7,7 +7,7 @@
 # ============================================================
 
 x-image: &image
-  image: ghcr.io/drsaluml/last-oasis-docker-dedicated-server:latest
+  image: ghcr.io/steam-dedicated-server/last-oasis-docker:latest
 
 x-common: &common
   <<: *image

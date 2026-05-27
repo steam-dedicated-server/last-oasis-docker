@@ -13,7 +13,7 @@ resources:
   # after copying secret.example.yaml.
 
 images:
-  - name: ghcr.io/drsaluml/last-oasis-docker-dedicated-server
+  - name: ghcr.io/steam-dedicated-server/last-oasis-docker
     newTag: latest
 
 commonLabels:
