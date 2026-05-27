@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="last-oasis-logo.jpg" alt="Last Oasis" width="460" />
+</p>
+
 # Last Oasis Dedicated Server
 
 High-performance, container-first dedicated server for [Last Oasis](https://lastoasis.gg/).
