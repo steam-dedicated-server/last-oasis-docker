@@ -17,6 +17,40 @@ lo::server::_assert_installed() {
   fi
 }
 
+# UE4 dedicated servers built with the Steam SDK dlopen steamclient.so
+# from $HOME/.steam/sdk{32,64}/. steamcmd drops the runtime under
+# different paths depending on version, so search known locations and
+# symlink the first hit.
+lo::server::_link_steamclient() {
+  local arch link target candidate
+  for arch in 32 64; do
+    link="$HOME/.steam/sdk${arch}/steamclient.so"
+    [[ -e "$link" ]] && continue
+
+    target=""
+    for candidate in \
+      "$HOME/.steam/steamcmd/linux${arch}/steamclient.so" \
+      "$HOME/Steam/steamcmd/linux${arch}/steamclient.so" \
+      "$HOME/.steam/steam/linux${arch}/steamclient.so" \
+      "$HOME/.steam/Steam/linux${arch}/steamclient.so" \
+      "/home/steam/steamcmd/linux${arch}/steamclient.so"; do
+      if [[ -e "$candidate" ]]; then
+        target="$candidate"
+        break
+      fi
+    done
+
+    if [[ -z "$target" ]]; then
+      lo::log::warn "steamclient.so for linux${arch} not found in any expected path"
+      continue
+    fi
+
+    mkdir -p "$(dirname "$link")"
+    ln -sfT "$target" "$link"
+    lo::log::info "linked $link → $target"
+  done
+}
+
 lo::server::run() {
   lo::config::require \
     SERVER_CUSTOMER_KEY \
@@ -30,15 +64,34 @@ lo::server::run() {
 
   lo::server::_assert_installed
   lo::config::print
+  lo::server::_link_steamclient
+
+  # Help libraries that dlopen by name (not absolute path) find
+  # steamclient.so.
+  export LD_LIBRARY_PATH="$HOME/.steam/sdk64:$HOME/.steam/sdk32${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+  # Headroom for FDs (Steam SDK + many concurrent player connections).
+  ulimit -n 65536 2>/dev/null || true
 
   local bin
   bin=$(lo::server::_binary)
+
+  # Built-in flags:
+  #   -log                              — write Mist.log
+  #   -force_steamclient_link           — UE4 uses Steam SDK linkage
+  #   -messaging                        — engine messaging subsystem
+  #   -NoLiveServer                     — disable live-server gating
+  #   -USEALLAVAILABLECORES             — UE4 task graph across cores
+  #   -EnableParallelCharacterMovement  — parallel character movement
+  #   -backendapiurloverride=…          — production matchmaking backend
   local -a args=(
-    "Mist"
     -log
+    -force_steamclient_link
     -messaging
     -NoLiveServer
     -EnableParallelCharacterMovement
+    -USEALLAVAILABLECORES
+    -backendapiurloverride=backend.last-oasis.com
     "-identifier=${SERVER_IDENTIFIER}"
     "-port=${SERVER_PORT}"
     "-QueryPort=${SERVER_QUERY_PORT}"
