@@ -160,16 +160,19 @@ shares the same `lastoasis-data` volume — install/update once via the
 ## Kubernetes
 
 ```bash
-# 1. Render your secret from the example template
+# 1. Create the namespace
+kubectl create namespace last-oasis
+
+# 2. Render your Secret from the template
 cp k8s/secret.example.yaml k8s/secret.yaml
 $EDITOR k8s/secret.yaml
-
-# 2. Apply
-kubectl apply -f k8s/namespace.yaml
 kubectl -n last-oasis apply -f k8s/secret.yaml
+
+# 3. Apply the bundle
 kubectl -n last-oasis apply -k k8s/
 
-# 3. Watch
+# 4. Watch
+kubectl -n last-oasis logs -f job/lastoasis-install
 kubectl -n last-oasis get pods -w
 kubectl -n last-oasis logs -f deploy/lastoasis-server
 ```
@@ -177,6 +180,9 @@ kubectl -n last-oasis logs -f deploy/lastoasis-server
 `Deployment` runs with `hostNetwork: true` so the game ports come
 straight off the node's IP. Startup / liveness / readiness probes all
 use the same A2S healthcheck.
+
+See [`k8s/README.md`](k8s/README.md) for the full guide (day-2 ops,
+multi-map layouts, teardown).
 
 ---
 
