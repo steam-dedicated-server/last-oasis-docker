@@ -18,7 +18,7 @@ High-performance, container-first dedicated server for [Last Oasis](https://last
 
 ```bash
 # 1. Grab the compose file
-curl -fLO https://raw.githubusercontent.com/drsaluml/last-oasis-docker-dedicated-server/main/compose/docker-compose.yml
+curl -fLO https://raw.githubusercontent.com/steam-dedicated-server/last-oasis-docker/main/compose/docker-compose.yml
 
 # 2. Replace every <REPLACE_*> placeholder in the `environment` block
 $EDITOR docker-compose.yml
