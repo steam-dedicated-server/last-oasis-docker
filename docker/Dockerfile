@@ -10,6 +10,10 @@
 # ---------- Stage 1: steamcmd downloader ----------
 FROM ubuntu:24.04 AS steamcmd
 
+# `pipefail` so a mid-download curl failure fails the whole pipeline
+# (otherwise tar may exit 0 on a truncated archive).
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
